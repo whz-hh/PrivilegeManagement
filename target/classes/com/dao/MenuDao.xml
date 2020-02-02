@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.MenuDao">
+	<cache></cache>
+	<!--//通过角色等级来获取菜单
+	public Menu getMenuByMenuGrade(String menuGrade);  -->
+	<select id="getMenuByMenuGrade" resultType="com.entities.Menu">
+	select * from menu where menu_grade =#{menuGrade};
+	</select>
+	<!-- //删除菜单
+	public void doDeleteMenu(Menu menu); -->
+	<delete id="doDeleteMenu">
+	delete from menu where menu_id =#{menuId};
+	</delete>
+	<!-- //修改菜单
+	public void doUpdateMenu(Menu menu); -->
+	<update id="doUpdateMenu">
+	update menu set menu_name=#{menuName},url=#{url} where menu_id =#{menuId};
+	</update>
+	<!--//通过菜单Id 查询菜单
+	public Menu getMenuByMenu(Integer menuId);  -->
+	<select id="getMenuByMenu" resultMap="getRole" useCache="false">
+	select * from menu where menu_id =#{menuId};
+	</select>
+	<!--//获取最大的等级
+	public String getMenuGrade(Menu menu);  -->
+	<select id="getMenuGrade" resultType="string">
+	select menu_grade from menu where menu_grade like '${menuGrade}___' order by menu_grade desc limit 0,1;
+	</select>
+	<!-- //添加菜单
+	public void doInsertMenu(Menu menu); -->
+	<insert id="doInsertMenu" >
+	insert into menu(menu_name,project_id,url,menu_grade)
+	values(#{menuName},#{projectId},#{url},#{menuGrade});
+	</insert>
+	<!-- //获取该项目所有一级菜单或二级三级菜单
+	public List<Menu> getAllMenuByProjectId(Integer projectId ,String menuGrade);-->
+	<resultMap type="com.entities.Menu" id="getRole">
+		<id	property="menuId" column="menu_id"/>
+		<collection property="roles" column="menu_id" select="com.dao.RoleDao.getRoleByMenuId"></collection>
+	</resultMap>
+	<select id="getAllMenuByProjectId" resultMap="getRole" useCache="false">
+		select * from menu where project_id =#{param1} and menu_grade like '${param2}___'; 
+	</select>
+<!-- 	<resultMap type="com.entities.AccountRole" id="myAccountRoleById">
+		<id column="account_id" property="accountId"/>
+		<collection property="roles" column="" select="com.dao.MenuDao.getMenuByRole"></collection>
+	</resultMap>
+ -->	
+<!-- 	<select id="getRoleByAccountId" resultMap="list" useCache="false">
+		select account_id,role_id from account_role where account_id = #{accountId}
+	</select> -->
+	
+	<select id="getMenuByAccountId" resultType="_int" useCache="false">
+		select distinct menu_id from role_menu where role_id in 
+		(select role_id from account_role where account_id = #{accountId})
+	</select>
+	
+	<select id="getMenuByMenuId" resultType="com.entities.Menu" useCache="false">
+		select menu_id,menu_name,project_id,url,menu_grade from menu where project_id = #{param2}
+		 and menu_id in  
+		 <foreach collection="param1" open="(" close=")" item="menuId" separator=",">
+		 	#{menuId}
+		 </foreach>
+	</select>
+	
+	<select id="getMenuLikeMenuGrade" resultType="com.entities.Menu" useCache="false">
+		<!-- <bind name="newMenuGrade" value="''+param1+'___'"/> -->
+		select menu_id,menu_name,project_id,url,menu_grade from menu where menu_grade like #{param1} 
+		and menu_id IN(
+		SELECT menu_id FROM role_menu WHERE role_id = #{param2}
+		) 
+		 AND project_id = #{param3}
+	</select>
+	
+<!-- 	<select id="">
+		<bind name="newMenuGrade" value="param1+"/>
+		select menu_id,menu_name,project_id,url,menu_grade where menu where menu_grade like #{newMenuGrade}
+	</select>
+ -->	
+</mapper>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.AccountDao">
+	<cache></cache>
+	<select id="loginAccount" resultType="com.entities.Account" useCache="false">
+		select account_id,account_name,account_password,last_name
+		from account where account_name = #{param1} and account_password = #{param2}
+	</select>
+	
+	<!--	通过用户Id和项目id获得详细信息
+	 public Account getAccountByAccountIdAndProjectId(Integer accountId,Integer projectId);
+	 -->
+	 <resultMap type="com.entities.Account" id="myAccount">
+	 	<collection property="roles" column="{accountId=account_id,projectId=projectId }" select="com.dao.RoleDao.getRoleByAccountIdAndProjectId"></collection>
+	 </resultMap>
+	 <select id="getAccountByAccountIdAndProjectId" resultMap="myAccount" useCache="false">
+	 	select * ,${param2} projectId 
+	 	from account where account_id =#{param1};
+	 </select>
+	 <select id="getAllAccount" resultType="com.entities.Account" useCache="false">
+	select account_id,account_name,last_name from account
+	</select>
+	<insert id="insertAccount">
+	insert into account(account_name,account_password,last_name) values(#{accountName},#{accountPassword},#{lastName})
+	</insert>
+	<delete id="deleteAccount">
+	delete from account where account_id=#{accountId}
+	</delete>
+	<update id="updateAccount">
+	update account set account_password=#{accountPassword}, account_name=#{accountName},last_name=#{lastName} where account_id=#{accountId}
+	</update>
+	<select id="getAccountByLastName" resultType="com.entities.Account" useCache="false">
+	select account_id,account_name,last_name from account where last_name like #{lastName}
+	</select>
+	<select id="getAccountByAccountId" resultType="com.entities.Account" useCache="false">
+	select account_id,account_name,account_password,last_name from account  where account_id=#{accountId}
+	</select>
+</mapper>

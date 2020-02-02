@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.ProjectDao">
+	<cache></cache>
+	<select id="getProjectLikeProjectName" resultType="com.entities.Project">
+		select * from project where project_name like #{projectName}
+	</select>
+	<delete id="doDelProject">
+		delete from project where project_id = #{projectId}
+	</delete>
+	<insert id="doInsProject">
+		insert into project(project_name,project_info,launch_date) value(#{projectName},#{projectInfo},#{launchDate})
+	</insert>
+	<update id="doUpdProject">
+		update project
+		<trim prefix=" set " suffixOverrides=",">
+			<if test="projectName != null and projectName != ''">
+				project_name = #{projectName},
+			</if>
+			<if test="projectInfo != null and projectInfo != ''">
+				project_info = #{projectInfo},
+			</if>
+			<if test="launchDate != null and launchDate != ''">
+				launch_date = #{launchDate},
+			</if>
+		</trim>
+		  where project_id = #{projectId}
+	</update>
+</mapper>

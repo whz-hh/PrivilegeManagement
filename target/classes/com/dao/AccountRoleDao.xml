@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.AccountRoleDao">
+	<cache></cache>
+	<resultMap type="com.entities.Account" id="myAccount">
+		<id column="account_id" property="accountId"/>
+		<collection property="roles" column="account_id" select="com.dao.AccountRoleDao.getRoleByAccountIdAndProjectId"></collection>
+	</resultMap>
+	<select id="getAccountAndRoleLikeAccountName" resultMap="myAccount" useCache="false">
+		select * from account where last_name like #{lastName}
+	</select>
+	<select id="getRoleByAccountIdAndProjectId" resultType="com.entities.Role" useCache="false">
+		select * from role where role_id in 
+		(select role_id from account_role where account_id = #{accountId})
+	</select>
+	
+	<select id="getRole" resultType="com.entities.Role" useCache="false">
+		select * from role
+	</select>
+	
+	<delete id="doDelAccountRole">
+		delete from account_role where account_id = #{accountId}
+	</delete>
+	
+	<insert id="doInsAccountRole">
+		insert into account_role(account_id,role_id) value(#{accountId},#{roleId})
+	</insert>
+
+</mapper>

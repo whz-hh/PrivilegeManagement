@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.RoleMenuDao">
+	<!-- //通过菜单id删除角色菜单关系表
+	public void doDeleteRoleMenuByMenuId(Integer menuId);-->
+	<delete id="doDeleteRoleMenuByMenuId" >
+	delete from role_menu where menu_id=#{menuId};
+	</delete>
+	<!--//传入数组和菜单来添加角色菜单
+	public void doInsertRoleMenu(String [] reoles,Integer menuId); -->
+	<insert id="doInsertRoleMenu" >
+	insert into role_menu(role_id,menu_id) values
+	<foreach collection="param1" item="roleId"  separator=",">
+		(#{roleId},#{param2})
+	</foreach>
+	</insert>
+	<!--//通过菜单等级来找出当前菜单的子菜单所有角色集合
+	public List<Integer> getSubMenuRoleIdsByMenuGrade(String menuGrade);  -->
+	<select id="getSubMenuRoleIdsByMenuGrade" resultType="_int">
+	select DISTINCT role_id from role_menu where menu_id in(select menu_id from menu where menu_grade like '${menuGrade}%' and menu_grade !=#{menuGrade})
+	</select>
+</mapper>

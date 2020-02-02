@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.RoleDao">
+	<!--//通过菜单id获取角色集合
+	public List<Role> getRoleByMenuId(Integer menuId);  -->
+	<select id="getRoleByMenuId" resultType="com.entities.Role">
+		select * from role where role_id in (select role_id from role_menu where menu_id =#{menuId})
+	</select>
+	<!--//通过AccountId和projectId获取所有角色
+	public List<Role> getRoleByAccountIdAndProjectId(@Param("accountId")Integer accountId,@Param("projectId")Integer projectId);  -->
+	<resultMap type="com.entities.Role" id="myRole">
+		<collection property="menus" column="{roleId=role_id ,projectId=projectId}" select="com.dao.MenuDao.getMenuByRoleIdAndProjectId"></collection>
+	</resultMap>
+	<select id="getRoleByAccountIdAndProjectId" resultMap="myRole">
+		select * ,${projectId} projectId from role 
+		where role_id in (select role_id from account_role where account_id=#{accountId})
+	</select>
+	<select id="getAllRole" resultType="com.entities.Role">
+	select * from role
+	</select>
+	<select id="getRoleByRoleId" resultType="com.entities.Role">
+	select  role_id,role_name from role where role_id=#{roleId}
+	</select>
+	<insert id="insertRole">
+	insert into role(role_name) values( #{roleName})
+	</insert>
+	<delete id="deleteRole">
+	delete from role where role_id=#{roleId}
+	</delete>
+	<update id="updateRole">
+	update role set role_name=#{roleName} where role_id=#{roleId}
+	</update>
+	<select id="getRoleByLikeRoleName" resultType="com.entities.Role">
+	select  role_id,role_name from role where role_name like #{roleName}
+	</select>
+</mapper>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<settings>
+		<!-- 设置自动驼峰命名 -->
+		<setting name="mapUnderscoreToCamelCase" value="true"></setting>
+		<!-- 设置延迟加载[按需加载] -->
+		<setting name="lazyLoadingEnabled" value="true"/>
+		<setting name="aggressiveLazyLoading" value="false"/>
+		<!-- 
+			开启二级缓存 : MyBatis经常更换版本，不同的版本默认的配置不同，
+			所以，不管默认值是什么，你项目确定要使用的就配置
+		-->
+		<setting name="cacheEnabled" value="true"/>
+	</settings>
+	<databaseIdProvider type="DB_VENDOR">
+		<property name="MySQL" value="mysql"/>
+	</databaseIdProvider>
+</configuration>
